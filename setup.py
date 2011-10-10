@@ -1,19 +1,18 @@
-#!/usr/bin/env python
-
 from os import path
-from distutils.core import setup
+from setuptools import setup
 
 from pycallgraph import __version__
 
-# Only install the man page if the correct directory exists
-# XXX: Commented because easy_install doesn't like it
-#man_path = '/usr/share/man/man1/'
-#if path.exists(man_path):
-#    data_files=[['/usr/share/man/man1/', ['man/pycallgraph.1']]]
-#else:
-#    data_files=None
+#TODO: check how to install the manual file, or generate the manual
+#from another format (probably better)
 
-data_files=None
+INSTALL_REQUIRES = []
+
+# add configobj to the import if not there
+try:
+    import configobj
+except ImportError:
+    INSTALL_REQUIRES.append('configobj')
 
 setup(
     name='pycallgraph',
@@ -25,7 +24,9 @@ setup(
     url='http://pycallgraph.slowchop.com/',
     py_modules=['pycallgraph'],
     scripts=['scripts/pycallgraph'],
-    data_files=data_files,
+    install_requires=INSTALL_REQUIRES,
+    #TODO: check if this is correct
+    setup_requires=INSTALL_REQUIRES,
     long_description = \
 '''Python Call Graph uses GraphViz to generate call graphs from one execution
 of your Python code. It's very easy to use and can point out possible problems
