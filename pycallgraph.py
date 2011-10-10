@@ -24,7 +24,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 __version__ = '0.5.1'
 __author__ = 'Gerald Kaszuba'
 
-import configobj
 import inspect
 import math
 import os
@@ -33,9 +32,10 @@ import sys
 import tempfile
 import time
 
+from configobj import ConfigObj
 from distutils import sysconfig
 from fnmatch import fnmatch
-from subprocess import Popen
+from subprocess import Popen, PIPE
 
 
 # Initialise module variables.
@@ -71,7 +71,7 @@ def reset_settings():
         'include_stdlib': True,
     }
 
-    graph_attributes = ConfigObj('graphviz_default.ini').as_dict()
+    graph_attributes = ConfigObj('graphviz_default.ini').dict()
     # add the possibility of a user file
 
 
@@ -408,13 +408,16 @@ def make_dot_graph(filename, format='png', tool='dot', stop=True):
     else:
         # create a temporary file to be used for the dot data
         fd, tempname = tempfile.mkstemp()
+        # FIXME: modernize the approach
         f = os.fdopen(fd, 'w')
         f.write(dot_data)
         f.close()
 
         cmd = '%(tool)s -T%(format)s -o%(filename)s %(tempname)s' % locals()
         try:
-            ret = os.system(cmd)
+            proc = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
+            ret = proc.wait()
+
             if ret:
                 raise PyCallGraphException( \
                     'The command "%(cmd)s" failed with error ' \
