@@ -1,5 +1,10 @@
 Pycallgraph
 
+* TODO remove all the *global* and make the code more testable
+
+* TODO clean up scripts and similar issues
+
+* TODO use context managers
 
 # Local Variables:
 # mode: org
