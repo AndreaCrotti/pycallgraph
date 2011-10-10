@@ -24,14 +24,19 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 __version__ = '0.5.1'
 __author__ = 'Gerald Kaszuba'
 
+import configobj
 import inspect
-import sys
 import math
 import os
 import re
+import sys
 import tempfile
 import time
+
 from distutils import sysconfig
+from fnmatch import fnmatch
+from subprocess import Popen
+
 
 # Initialise module variables.
 # TODO Move these into settings
