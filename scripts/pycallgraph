@@ -24,8 +24,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
 import os
+import sys
 
-from sys import exit, argv
 from argparse import ArgumentParser
 
 import pycallgraph
@@ -46,6 +46,7 @@ def parse_arguments(args):
         '-q', '--quiet', action='store_true',
         help='Suppress status output to the console.')
 
+    #TODO: give a range of choices, and include org-mode/rst formats
     parser.add_argument(
         '-t', '--tool', default='dot',
         help='The tool from Graphviz to use.')
@@ -82,13 +83,22 @@ def parse_arguments(args):
         nargs='*',
         help='Wildcard pattern of modules to exclude in time measurement. ' \
             'You can have multiple exclude arguments.')
-    
+
+    parser.add_argument(
+        'program',
+        nargs=1,
+        help='program to run')
+
+    parser.add_argument(
+        'arguments',
+        nargs='*',
+        help='arguments to pass to the original program')
 
     return parser.parse_args(args)
 
 
 def main():
-    ns = parse_arguments(argv[1:])
+    ns = parse_arguments(sys.argv[1:])
 
     if not ns.include:
         ns.include = ['*']
@@ -99,7 +109,7 @@ def main():
         max_depth=ns.max_depth,
     )
 
-# Create timing filter
+    # Create timing filter
     if not ns.include_timing:
         ns.include_timing = ['*']
 
@@ -108,35 +118,38 @@ def main():
         exclude=ns.exclude_timing,
     )
 
-    pycallgraph.settings['include_stdlib'] = ns.include_stdlib
+    pycallgraph.settings['include_stdlib'] = ns.stdlib
 
-# Remove this script from the argument list so we don't break the Python
-# script we are calling.
-    sys.argv = args
+    # Sometimes scripts change "options", so use a secret one.
+    # Also, this (kind of) allows pygc to call itself, since calling itself would
+    # overwrite global variables in this file.
+    # try:
+    #     __pygc_ns.appenda(options)
+    # except NameError:
+    #     __pygc_options = [options]
 
-# Sometimes scripts change "options", so use a secret one.
-# Also, this (kind of) allows pygc to call itself, since calling itself would
-# overwrite global variables in this file.
-    try:
-        __pygc_ns.append(options)
-    except NameError:
-        __pygc_options = [options]
+    #XXX: why on earth? 
+    # Insert the current working directory into the path
+    # sys.path.insert(0, os.getcwd())
 
-# Insert the current working directory into the path
-    sys.path.insert(0, os.getcwd())
-
-    if not ns.quiet:
-        print('Starting trace')
+    #TODO: use logging instead
+    # if not ns.quiet:
+    #     print('Starting trace')
 
     reraise = False
 
+    #TODO: make it a decorator or something similar
     pycallgraph.start_trace(
         filter_func=filter_func,
         time_filter_func=time_filter_func,
     )
 
+    sys.argv = ' '.join(ns.arguments)
+    
+    #TODO: see if it's possible to pass the arguments in another way
     try:
-        execfile(args[0])
+        assert len(ns.program) == 1
+        execfile(ns.program[0])
     except SystemExit, e:
         # Ignore it when the script calls os.exit() so we can still make the graph.
         pass
@@ -145,12 +158,12 @@ def main():
         if not ns.quiet:
             print('Caught exception, will raise after graph is made.')
 
-    options = __pygc_ns.pop()
+    # options = __pygc_ns.pop()
 
     if not ns.quiet:
         print('Creating %s' % ns.output_file)
 
-    pycallgraph.make_dot_graph(ns.output_file, ns.format, ns.tool)
+    pycallgraph.make_dot_graph(ns.output_file, ns.image_format, ns.tool)
 
     if reraise:
         if not ns.quiet:
