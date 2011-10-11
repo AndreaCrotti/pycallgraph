@@ -1,12 +1,11 @@
 from os import path
 from setuptools import setup
 
-from pycallgraph import __version__
-
 #TODO: check how to install the manual file, or generate the manual
 #from another format (probably better)
 
 INSTALL_REQUIRES = []
+VERSION = "0.1"
 
 # add configobj to the import if not there
 try:
@@ -16,7 +15,7 @@ except ImportError:
 
 setup(
     name='pycallgraph',
-    version=__version__,
+    version=VERSION,
     description='Python Call Graph uses GraphViz to generate call graphs ' \
         'from one execution of your Python code.',
     author='Gerald Kaszuba',
@@ -33,7 +32,7 @@ of your Python code. It's very easy to use and can point out possible problems
 with your code execution.''',
     download_url =
     'http://pycallgraph.slowchop.com/files/download/pycallgraph-%s.tar.gz' % \
-        __version__,
+        VERSION,
     classifiers = [
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
@@ -46,4 +45,3 @@ with your code execution.''',
         'Topic :: Software Development :: Debuggers',
         ],
 )
-# vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
