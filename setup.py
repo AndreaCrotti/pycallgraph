@@ -1,10 +1,8 @@
 from os import path
 from setuptools import setup
 
-#TODO: check how to install the manual file, or generate the manual
-#from another format (probably better)
-
 INSTALL_REQUIRES = []
+#TODO: get the version number from git instead
 VERSION = "0.1"
 
 # add configobj to the import if not there
@@ -12,6 +10,11 @@ try:
     import configobj
 except ImportError:
     INSTALL_REQUIRES.append('configobj')
+
+try:
+    import argparse
+except ImportError:
+    INSTALL_REQUIRES.append('argparse')
 
 setup(
     name='pycallgraph',
