@@ -124,13 +124,13 @@ def main():
     # Also, this (kind of) allows pygc to call itself, since calling itself would
     # overwrite global variables in this file.
     # try:
-    #     __pygc_ns.appenda(options)
+    #     __pygc_ns.append(options)
     # except NameError:
     #     __pygc_options = [options]
 
     #XXX: why on earth? 
     # Insert the current working directory into the path
-    # sys.path.insert(0, os.getcwd())
+    sys.path.insert(0, os.getcwd())
 
     #TODO: use logging instead
     # if not ns.quiet:

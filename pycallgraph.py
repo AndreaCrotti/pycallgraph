@@ -207,6 +207,7 @@ def tracer(frame, event, arg):
 
         # Work out the module name
         module = inspect.getmodule(code)
+
         if module:
             module_name = module.__name__
             module_path = module.__file__
@@ -445,7 +446,8 @@ def make_gdf_graph(filename, stop=True):
         f = open(filename, 'w')
         f.write(get_gdf())
     finally:
-        if f: f.close()
+        if f:
+            f.close()
 
 
 def simple_memoize(callable_object):
