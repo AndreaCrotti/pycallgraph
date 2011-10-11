@@ -90,25 +90,25 @@ def parse_arguments(args):
 def main():
     ns = parse_arguments(argv[1:])
 
-    if not options.include:
-        options.include = ['*']
+    if not ns.include:
+        ns.include = ['*']
 
     filter_func = pycallgraph.GlobbingFilter(
-        include=options.include,
-        exclude=options.exclude,
-        max_depth=options.max_depth,
+        include=ns.include,
+        exclude=ns.exclude,
+        max_depth=ns.max_depth,
     )
 
 # Create timing filter
-    if not options.include_timing:
-        options.include_timing = ['*']
+    if not ns.include_timing:
+        ns.include_timing = ['*']
 
     time_filter_func = pycallgraph.GlobbingFilter(
-        include=options.include_timing,
-        exclude=options.exclude_timing,
+        include=ns.include_timing,
+        exclude=ns.exclude_timing,
     )
 
-    pycallgraph.settings['include_stdlib'] = options.include_stdlib
+    pycallgraph.settings['include_stdlib'] = ns.include_stdlib
 
 # Remove this script from the argument list so we don't break the Python
 # script we are calling.
@@ -118,14 +118,14 @@ def main():
 # Also, this (kind of) allows pygc to call itself, since calling itself would
 # overwrite global variables in this file.
     try:
-        __pygc_options.append(options)
+        __pygc_ns.append(options)
     except NameError:
         __pygc_options = [options]
 
 # Insert the current working directory into the path
     sys.path.insert(0, os.getcwd())
 
-    if not options.quiet:
+    if not ns.quiet:
         print('Starting trace')
 
     reraise = False
@@ -142,22 +142,22 @@ def main():
         pass
     except Exception, e:
         reraise = True
-        if not options.quiet:
+        if not ns.quiet:
             print('Caught exception, will raise after graph is made.')
 
-    options = __pygc_options.pop()
+    options = __pygc_ns.pop()
 
-    if not options.quiet:
-        print('Creating %s' % options.output_file)
+    if not ns.quiet:
+        print('Creating %s' % ns.output_file)
 
-    pycallgraph.make_dot_graph(options.output_file, options.format, options.tool)
+    pycallgraph.make_dot_graph(ns.output_file, ns.format, ns.tool)
 
     if reraise:
-        if not options.quiet:
+        if not ns.quiet:
             print('Done and raising the caught exception:')
         raise
 
-    if not options.quiet:
+    if not ns.quiet:
         print('Done!')
 
 if __name__ == '__main__':
