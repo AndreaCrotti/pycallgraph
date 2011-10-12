@@ -198,7 +198,7 @@ def tracer(frame, event, arg):
     global func_time
     global func_time_max
 
-    if event == 'call':
+    def handle_call():
         keep = True
         code = frame.f_code
 
@@ -244,7 +244,7 @@ def tracer(frame, event, arg):
 
         # Store the call information
         if keep:
-            
+
             if call_stack:
                 fr = call_stack[-1]
             else:
@@ -268,7 +268,7 @@ def tracer(frame, event, arg):
             call_stack.append('')
             call_stack_timer.append(None)
 
-    if event == 'return':
+    def handle_return():
         if call_stack:
             full_name = call_stack.pop(-1)
             if call_stack_timer:
@@ -282,6 +282,14 @@ def tracer(frame, event, arg):
                 func_time[full_name] += call_time
                 if func_time[full_name] > func_time_max:
                     func_time_max = func_time[full_name]
+
+    
+    event_handler = {
+        'call': handle_call,
+        'return': handle_return
+    }
+
+    event_handler[event]()
 
     return tracer
 
