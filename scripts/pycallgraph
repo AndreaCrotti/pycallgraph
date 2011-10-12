@@ -144,6 +144,7 @@ def main():
         time_filter_func=time_filter_func,
     )
 
+    #TODO: is this the only way to call the external module?
     sys.argv = ' '.join(ns.arguments)
     
     #TODO: see if it's possible to pass the arguments in another way
